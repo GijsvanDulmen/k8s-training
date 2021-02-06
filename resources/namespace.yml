@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: apps-limit-ranges
+  namespace: apps
+spec:
+  limits:
+  - default:
+      memory: "512Mi"
+    defaultRequest:
+      memory: "256Mi"
+    max:
+      cpu: "800m"
+      memory: "1Gi"
+    min:
+      cpu: "1m"
+      memory: "100Mi"
+    type: Container
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: apps-resource-quotas
+  namespace: apps
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"

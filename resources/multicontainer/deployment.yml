@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-multicontainer
+  namespace: apps
+  labels:
+    app: multicontainer
+    version: v1
+    team: the-a-team
+spec:
+  selector:
+    matchLabels:
+      app: multicontainer
+      version: v1
+  replicas: 1
+  
+  # Pod Template Specification
+  template:
+    metadata:
+      labels:
+        app: multicontainer
+        version: v1
+    spec:
+      containers:
+      - name: container-01
+        image: gijsvandulmen/echoserver:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "101Mi"
+          limits:
+            cpu: "100m"
+            memory: "120Mi"
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 600
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 2
+      - name: container-02
+        image: gijsvandulmen/echoserver:latest
+        imagePullPolicy: Always
+        env:
+        - name: ECHO_SERVER_PORT
+          value: "8081"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "101Mi"
+          limits:
+            cpu: "100m"
+            memory: "120Mi"
+        ports:
+          - containerPort: 8081
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8081
+          initialDelaySeconds: 2
+          periodSeconds: 600
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 2
+      terminationGracePeriodSeconds: 2

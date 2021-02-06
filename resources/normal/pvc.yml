@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-normal-pvc
+  namespace: apps
+spec:
+  volumeName: app-normal-pv
+  resources:
+    requests:
+      storage: 10Mi
+  accessModes:
+    - ReadWriteMany

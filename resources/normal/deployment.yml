@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-normal
+  namespace: apps
+  labels:
+    app: normal
+    version: v1
+    team: the-a-team
+  annotations:
+    # could be used for annotating
+    # for example instructions for controllers
+    cert-manager.io/cluster-issuer: nameOfClusterIssuer
+spec:
+  selector:
+    matchLabels:
+      app: normal
+      version: v1
+  replicas: 2
+  revisionHistoryLimit: 3
+
+  # Strategy for deployment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  
+  # Pod Template Specification
+  template:
+    metadata:
+      labels:
+        app: normal
+        version: v1
+    spec:
+      # Make sure two pods are scheduled on different nodes
+      # Unfortunately not possible during execution
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - normal
+            topologyKey: "kubernetes.io/hostname"
+      # Containers which should start and stop immediately
+      # Doing some pre-init task like updating databases and such
+      initContainers:
+      - name: hello-world
+        image: gijsvandulmen/echoserver:latest
+        imagePullPolicy: Always
+        env:
+          - name: NAME
+            value: "init"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "101Mi"
+          limits:
+            cpu: "100m"
+            memory: "120Mi"
+        command:
+          - "sh"
+          - "-c"
+          - "echo \"hello world from ${NAME} container!\""
+      # Your actual application
+      volumes:
+      - name: secrets-volume
+        secret:
+          secretName: app-normal-secret
+      # Empty dirs
+      - name: cache-in-memory
+        emptyDir:
+          medium: "Memory"
+          sizeLimit: "2Mi"
+      - name: cache-on-node-default-medium
+        emptyDir:
+          medium: ""
+          sizeLimit: "2M"
+      # Persistent volume
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: app-normal-pvc
+      containers:
+      - name: echoserver
+        image: gijsvandulmen/echoserver:latest
+        imagePullPolicy: Always
+        env:
+          - name: ENV_VAR
+            value: "value06"
+          - name: SHOW_HEADERS
+            value: "false"
+          - name: WATCH_DIR
+            value: "/etc/secrets"
+          # Inject env var from secret
+          - name: USERNAME_AT_START
+            valueFrom:
+              secretKeyRef:
+                name: app-normal-secret
+                key: APP_USERNAME
+          - name: DB_HOST_AT_START
+            valueFrom:
+              configMapKeyRef:
+                name: app-normal-configmap
+                key: DB_HOST
+        # Use secret key/value as env var key/value
+        envFrom:
+        - secretRef:
+            name: app-normal-secret
+        - configMapRef:
+            name: app-normal-configmap
+          
+        # Volume Mounts
+        volumeMounts:
+        - name: secrets-volume
+          mountPath: "/etc/secrets"
+          readOnly: true
+        - mountPath: /cache
+          name: cache-in-memory
+        - mountPath: /diskcache
+          name: cache-on-node-default-medium
+        - mountPath: /persistent
+          name: persistent-storage
+
+        # Resource
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "101Mi"
+          limits:
+            cpu: "100m"
+            memory: "120Mi"
+        ports:
+          - containerPort: 8080
+        
+        # Probes
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 600
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 2
+
+      # The grace period is the duration in seconds after the processes running in the pod
+      # are sent a termination signal and the time when the processes are forcibly halted
+      # with a kill signal. Set this value longer than the expected cleanup time for your
+      # process. Defaults to 30 seconds.
+      terminationGracePeriodSeconds: 3
