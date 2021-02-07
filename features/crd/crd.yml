@@ -1,0 +1,31 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: attendees.k8s.training.io
+spec:
+  group: k8s.training.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                attendee:
+                  type: string
+      additionalPrinterColumns:
+        - name: Attendee
+          type: string
+          description: The name of the attendee
+          jsonPath: .spec.attendee
+  scope: Namespaced
+  names:
+    plural: attendees
+    singular: attendee
+    kind: Attendee
+    shortNames:
+    - att

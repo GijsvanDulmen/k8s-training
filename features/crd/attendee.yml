@@ -1,0 +1,7 @@
+apiVersion: k8s.training.io/v1alpha1
+kind: Attendee
+metadata:
+  name: attendee-1
+  namespace: apps
+spec:
+  attendee: "Ralph Smeets"
