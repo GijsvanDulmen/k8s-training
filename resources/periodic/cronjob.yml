@@ -1,0 +1,33 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: periodic-job
+  namespace: apps
+spec:
+  # schedule every minute (for training purposes obviously)
+  schedule: "* * * * *"
+  # never schedule a job when one is already running
+  concurrencyPolicy: Forbid
+  # keeping track of resources within api server
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: heavy-batch-job
+            image: gijsvandulmen/echoserver:latest
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: "10m"
+                memory: "101Mi"
+              limits:
+                cpu: "100m"
+                memory: "120Mi"
+            command:
+              - "sh"
+              - "-c"
+              - "echo \"do something real heavy lifting in this container!\""

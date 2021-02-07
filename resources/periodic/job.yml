@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-job
+  namespace: apps
+spec:
+  completions: 4
+  parallelism: 2
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: heavy-batch-job
+        image: gijsvandulmen/echoserver:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "101Mi"
+          limits:
+            cpu: "100m"
+            memory: "120Mi"
+        command:
+          - "sh"
+          - "-c"
+          - "echo \"do in parallel!\" && sleep 6;"

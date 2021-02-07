@@ -6,3 +6,4 @@ kubectl apply -f ./normal
 kubectl apply -f ./outofmemory
 kubectl apply -f ./private
 kubectl apply -f ./secure
+kubectl apply -f ./periodic
