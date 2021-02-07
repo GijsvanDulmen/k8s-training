@@ -4,4 +4,4 @@ metadata:
   name: attendee-1
   namespace: apps
 spec:
-  attendee: "Ralph Smeets"
+  attendee: "Jan Jansen"
