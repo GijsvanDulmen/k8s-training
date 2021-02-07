@@ -1,0 +1,32 @@
+## INGRESS ##
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: private
+  name: allow-from-disrupt-in-trainees-namespace
+spec:
+  # apply policy to all pods
+  # in our private namespace
+  podSelector:
+    matchLabels:
+      app: private
+  ingress:
+  - from:
+    - namespaceSelector:
+        # namespace needs to be labelled accordingly
+        matchLabels:
+          department: trainees
+      podSelector:
+        matchLabels:
+          app: disrupt
+---
+## EGRESS ##
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-egress
+  namespace: private
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
