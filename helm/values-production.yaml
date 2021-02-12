@@ -1,2 +1,4 @@
 serviceAccounts:
 - name: simple-service-accounts
+- name: another-service-account
+- name: yet-another-service-account
