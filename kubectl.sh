@@ -30,3 +30,6 @@ kubectl get pods --all-namespaces -o json | jq
 kubectl get pods --all-namespaces -o yaml | yq -C e
 kubectl get pods --all-namespaces -o name
 kubectl get pods --all-namespaces -o wide
+
+# Use JQ for filtering
+kubectl get rolebindings --all-namespaces -o json | jq '.items[] | select(.roleRef.name=="admin") | select(.subjects[].kind="User")'
