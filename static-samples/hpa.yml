@@ -1,0 +1,38 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: scale-me
+spec:
+  # Point to your deployment which you want to autoscale!
+  # HPA just alters the replicas of the deployment
+  scaleTargetRef:
+    kind: Deployment
+    name: my-app
+    apiVersion: apps/v1
+
+  # Set bounds
+  minReplicas: 2
+  maxReplicas: 10
+
+  # influence behavior of the scale up / down
+  behavior:
+    scaleDown:
+      # only scale down when cpu stabilezes for 60s
+      stabilizationWindowSeconds: 60
+      # only scale down 10% of the pods in 60s
+      # to make sure we don't scale down too fast
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      # do not scale down:
+      # selectPolicy: Disabled
+    scaleUp:
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
