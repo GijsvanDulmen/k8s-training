@@ -1,0 +1,21 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: slow-storage
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  # see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  type: io1
+  iopsPerGB: "10"
+  fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-for-some-app
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: slow-storage
