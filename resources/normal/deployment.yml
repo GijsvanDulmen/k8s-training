@@ -129,12 +129,16 @@ spec:
           requests:
             cpu: "10m"
             memory: "101Mi"
+            # container storage
+            ephemeral-storage: "2Gi"
           limits:
             cpu: "100m"
             memory: "120Mi"
+            # container storage
+            ephemeral-storage: "4Gi"
         ports:
           - containerPort: 8080
-        
+
         # Probes
         livenessProbe:
           httpGet:
