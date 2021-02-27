@@ -132,9 +132,19 @@ spec:
             # container storage
             ephemeral-storage: "2Gi"
           limits:
+            # 100m = 0.1 cpu
+            # What is a cpu? The thing which is in your nodes :-)
+            # So... keep your nodes the same instance types
+            # So what if .... the application spikes in cpu? => Throttling!
             cpu: "100m"
+            
+            # So what if .... the application spikes in memory?
+            # reason:OOM Killed
             memory: "120Mi"
+
             # container storage
+            # So... what if the backing node get's low on storage?
+            # Evict pods!
             ephemeral-storage: "4Gi"
         ports:
           - containerPort: 8080
