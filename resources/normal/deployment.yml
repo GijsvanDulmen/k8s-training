@@ -85,6 +85,7 @@ spec:
           claimName: app-normal-pvc
       containers:
       - name: echoserver
+        # image: gijsvandulmen/echoserver-go:latest
         image: gijsvandulmen/echoserver:latest
         imagePullPolicy: Always
         env:
