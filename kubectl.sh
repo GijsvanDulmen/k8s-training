@@ -33,3 +33,6 @@ kubectl get pods --all-namespaces -o wide
 
 # Use JQ for filtering
 kubectl get rolebindings --all-namespaces -o json | jq '.items[] | select(.roleRef.name=="admin") | select(.subjects[].kind="User")'
+
+# Events
+kubectl get events -n apps --watch

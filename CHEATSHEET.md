@@ -4,4 +4,3 @@
 
 - dive gijsvandulmen:latest
 - dive gijsvandulmen-go:latest
-
