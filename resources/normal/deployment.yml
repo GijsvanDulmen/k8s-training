@@ -178,3 +178,5 @@ spec:
       # with a kill signal. Set this value longer than the expected cleanup time for your
       # process. Defaults to 30 seconds.
       terminationGracePeriodSeconds: 3
+
+      # see: https://github.com/GijsvanDulmen/sample-istio-images/blob/4465efe05e69430b140298e658eeda801fbca978/echo/index.js#L94
