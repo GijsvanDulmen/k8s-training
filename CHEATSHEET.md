@@ -2,5 +2,5 @@
 
 ## Dive - Container Image tool
 
-- dive gijsvandulmen:latest
-- dive gijsvandulmen-go:latest
+- dive gijsvandulmen/echoserver:latest
+- dive gijsvandulmen/echoserver-go:latest
