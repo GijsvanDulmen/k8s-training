@@ -23,7 +23,7 @@ spec:
     spec:
       affinity:
         # make sure the deployment preferes the worker node
-        # this will show the disruption budgt better
+        # this will show the disruption budget better
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 1
