@@ -1,0 +1,20 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: team-namespace
+  labels:
+
+    # probably added when openshift monitoring is configured
+    # will use user workload monitoring prometheus setup
+    openshift.io/user-monitoring: 'true'
+
+  annotations:
+    # Relevant SCC - Security Context Constraint annotations
+    openshift.io/sa.scc.supplemental-groups: 1001300000/10000
+    openshift.io/sa.scc.mcs: 's0:c36,c20'
+
+    # default range for UIDs
+    openshift.io/sa.scc.uid-range: 1001300000/10000
+spec:
+  finalizers:
+    - kubernetes

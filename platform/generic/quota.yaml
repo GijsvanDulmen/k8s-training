@@ -1,0 +1,25 @@
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: quotas
+  namespace: team-namespace
+spec:
+  hard:
+    limits.cpu: '32'
+    limits.memory: 128Gi
+    requests.cpu: '32'
+    requests.memory: 128Gi
+
+# interesting bit which K8s adds
+# and can be used to see how much you use
+status:
+  hard:
+    limits.cpu: '32'
+    limits.memory: 128Gi
+    requests.cpu: '32'
+    requests.memory: 128Gi
+  used:
+    limits.cpu: 6100m
+    limits.memory: 8199008Ki
+    requests.cpu: 450m
+    requests.memory: 2140232Ki

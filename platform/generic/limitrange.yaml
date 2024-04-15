@@ -1,0 +1,26 @@
+kind: LimitRange
+apiVersion: v1
+metadata:
+  name: limits
+  namespace: team-namespace
+spec:
+  limits:
+    - type: Container
+
+      # Max CPU and memory which you can set on a container
+      # A Pod can container multiple containers
+      max:
+        cpu: '14'
+        memory: 60Gi
+
+      # Used when not set on a container for Limits
+      default:
+        cpu: '1'
+        ephemeral-storage: 5Gi
+        memory: 512Mi
+
+      # Used when not set on container for requests
+      defaultRequest:
+        cpu: 50m
+        ephemeral-storage: 10Mi
+        memory: 256Mi

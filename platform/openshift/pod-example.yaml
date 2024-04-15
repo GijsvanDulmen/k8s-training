@@ -1,0 +1,102 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  annotations:
+    openshift.io/scc: restricted-v2
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  name: pod-5b45bc945f-psbpv
+  namespace: team-namespace
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: replicaset-5b45bc945f
+      uid: 90aa7125-ad80-4abe-89dd-d091141611e9
+      controller: true
+      blockOwnerDeletion: true
+spec:
+  restartPolicy: Always
+  serviceAccountName: pod-service-account
+  imagePullSecrets:
+    - name: pull-credentials
+  priority: 0
+  schedulerName: default-scheduler
+  enableServiceLinks: true
+  terminationGracePeriodSeconds: 30
+  preemptionPolicy: PreemptLowerPriority
+
+  # scheduled when this field is set
+  nodeName: worker-westeurope1-z49n4
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c36,c20'
+    # added by openshift by default
+    fsGroup: 1001300000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - resources:
+        limits:
+          cpu: 50m
+          ephemeral-storage: 5Gi
+          memory: 100Mi
+        requests:
+          cpu: 10m
+          ephemeral-storage: 10Mi
+          memory: 30Mi
+      terminationMessagePath: /dev/termination-log
+      name: pod
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsUser: 1001300000
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: kube-api-access-8n4nb
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: registry.azurecr.io/team/application:latest@sha256:1f43abff8647f
+  serviceAccount: pod-service-account
+  volumes:
+    - name: kube-api-access-8n4nb
+      projected:
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              name: kube-root-ca.crt
+              items:
+                - key: ca.crt
+                  path: ca.crt
+          - downwardAPI:
+              items:
+                - path: namespace
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+          - configMap:
+              name: openshift-service-ca.crt
+              items:
+                - key: service-ca.crt
+                  path: service-ca.crt
+        defaultMode: 420
+  dnsPolicy: ClusterFirst
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/memory-pressure
+      operator: Exists
+      effect: NoSchedule
