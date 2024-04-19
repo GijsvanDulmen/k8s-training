@@ -1,0 +1,67 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: application-x-monitor
+  namespace: team-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: application-x
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
+    spec:
+      restartPolicy: Always
+      serviceAccountName: application-x
+      imagePullSecrets:
+        - name: pull-credentials
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      containers:
+        - resources:
+            limits:
+              cpu: 600m
+              memory: 750Mi
+            requests:
+              cpu: 10m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 30
+          name: application-x
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 30
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+            # metrics port!
+            - containerPort: 8081
+              protocol: TCP
+          imagePullPolicy: Always
+          image: teamacr.azurecr.io/teamx/application-x:latest@sha256:1dbb30fb30fcb6db66230daa5ec481786f2b7e66cca66525a5ebe213a49f1750
+      serviceAccount: map-spring-boot
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

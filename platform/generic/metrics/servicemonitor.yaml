@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: application-x-monitor
+  namespace: team-namespace
+spec:
+  # your typical prometheus metrics
+  # service monitor
+  endpoints:
+    # scrapes every 30s
+    - interval: 30s
+      path: /actuator/prometheus
+      port: metrics
+      scheme: http
+  selector:
+    matchLabels:
+      app: application-x

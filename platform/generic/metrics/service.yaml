@@ -1,0 +1,23 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: application-x-monitor
+  namespace: team-namespace
+spec:
+  clusterIP: 172.30.158.233
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+    # metrics port used in servicemonitor
+    - name: metrics
+      protocol: TCP
+      port: 8084
+      targetPort: 8081
+  type: ClusterIP
+  selector:
+    app: application-x
